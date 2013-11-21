@@ -25,7 +25,8 @@ type RateLimitedConn struct {
 }
 
 // New returns a rate-limited connection based on the given connection.
-// The limits are specified in bytes per second (bps).
+// The limits are specified in bytes per second (bps) and 0 means no
+// limit.
 //
 // Note that rate-limiting doesn't take connection deadlines into account
 // (see SetDeadline, SetReadDeadline, and SetWriteDeadline) so be careful
@@ -111,8 +112,8 @@ func (rlc RateLimitedConn) Write(b []byte) (n int, err error) {
 	return
 }
 
-// SetReadLimit establishes a new limit (in bytes per second) for
-// reading from this connection.
+// SetReadLimit establishes a new limit (in bytes per second, 0 for
+// no limit) for reading from this connection.
 func (rlc RateLimitedConn) SetReadLimit(lim int) (err error) {
 	if lim < 0 {
 		err = errors.New("read limit cannot be negative")
@@ -122,8 +123,8 @@ func (rlc RateLimitedConn) SetReadLimit(lim int) (err error) {
 	return
 }
 
-// SetWriteLimit establishes a new limit (in bytes per second) for
-// writing to this connection.
+// SetWriteLimit establishes a new limit (in bytes per second, 0 for
+// no limit) for writing to this connection.
 func (rlc RateLimitedConn) SetWriteLimit(lim int) (err error) {
 	if lim < 0 {
 		err = errors.New("write limit cannot be negative")
