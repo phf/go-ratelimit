@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-type rateLimitedConn struct {
+type RateLimitedConn struct {
 	net.Conn		// underlying network connection
 	rlim, wlim int		// in bytes/second, 0 means no limit
 	rtime, wtime time.Time	// time of last actual read/write
@@ -35,14 +35,14 @@ func New(conn net.Conn, readLimit, writeLimit int) (rlc net.Conn, err error) {
 		err = errors.New("read/write limits cannot be negative")
 		return
 	}
-	rlc = rateLimitedConn{Conn: conn, rlim: readLimit, wlim: writeLimit}
+	rlc = RateLimitedConn{Conn: conn, rlim: readLimit, wlim: writeLimit}
 	return
 }
 
 // Read reads data from the connection.
 // If necessary this function will sleep for an appropriate amount
 // of time to achieve the requested rate-limit.
-func (rlc rateLimitedConn) Read(b []byte) (n int, err error) {
+func (rlc RateLimitedConn) Read(b []byte) (n int, err error) {
 	// fast path if there is no limit
 	if rlc.rlim <= 0 {
 		n, err = rlc.Conn.Read(b)
@@ -78,7 +78,7 @@ func (rlc rateLimitedConn) Read(b []byte) (n int, err error) {
 // Write writes data to the connection.
 // If necessary this function will sleep for an appropriate amount
 // of time to achieve the requested rate-limit.
-func (rlc rateLimitedConn) Write(b []byte) (n int, err error) {
+func (rlc RateLimitedConn) Write(b []byte) (n int, err error) {
 	// fast path if there is no limit
 	if rlc.wlim <= 0 {
 		n, err = rlc.Conn.Write(b)
@@ -113,7 +113,7 @@ func (rlc rateLimitedConn) Write(b []byte) (n int, err error) {
 
 // SetReadLimit establishes a new limit (in bytes per second) for
 // reading from this connection.
-func (rlc rateLimitedConn) SetReadLimit(lim int) (err error) {
+func (rlc RateLimitedConn) SetReadLimit(lim int) (err error) {
 	if lim < 0 {
 		err = errors.New("read limit cannot be negative")
 		return
@@ -124,7 +124,7 @@ func (rlc rateLimitedConn) SetReadLimit(lim int) (err error) {
 
 // SetWriteLimit establishes a new limit (in bytes per second) for
 // writing to this connection.
-func (rlc rateLimitedConn) SetWriteLimit(lim int) (err error) {
+func (rlc RateLimitedConn) SetWriteLimit(lim int) (err error) {
 	if lim < 0 {
 		err = errors.New("write limit cannot be negative")
 		return
