@@ -24,10 +24,10 @@ import (
 // limits. Not sure what else to do though...
 
 type testCase struct {
-	net string
-	addr string
-	rlim int
-	wlim int
+	net   string
+	addr  string
+	rlim  int
+	wlim  int
 	npack int
 	lpack int
 	total time.Duration
@@ -36,11 +36,11 @@ type testCase struct {
 const accuracy = 0.2
 
 var tests = []testCase{
-	{"tcp", "127.0.0.1:8080", 0, 0, 8, 1024, time.Duration(13*time.Microsecond)},
-	{"tcp", "127.0.0.1:8080", 4096, 0, 8, 1024, time.Duration(2*time.Second)},
-	{"tcp", "127.0.0.1:8080", 0, 4096, 8, 1024, time.Duration(2*time.Second)},
-	{"tcp", "127.0.0.1:8080", 2048, 4096, 8, 1024, time.Duration(4*time.Second)},
-	{"tcp", "127.0.0.1:8080", 4096, 2048, 8, 1024, time.Duration(4*time.Second)},
+	{"tcp", "127.0.0.1:8080", 0, 0, 8, 1024, time.Duration(13 * time.Microsecond)},
+	{"tcp", "127.0.0.1:8080", 4096, 0, 8, 1024, time.Duration(2 * time.Second)},
+	{"tcp", "127.0.0.1:8080", 0, 4096, 8, 1024, time.Duration(2 * time.Second)},
+	{"tcp", "127.0.0.1:8080", 2048, 4096, 8, 1024, time.Duration(4 * time.Second)},
+	{"tcp", "127.0.0.1:8080", 4096, 2048, 8, 1024, time.Duration(4 * time.Second)},
 }
 
 func TestConnections(t *testing.T) {
@@ -91,7 +91,7 @@ func testConnection(t *testing.T, info testCase) {
 
 func testClient(t *testing.T, info testCase) {
 	// make sure the server has time to come up
-	time.Sleep(500*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	// connect to the server
 	c, err := net.Dial(info.net, info.addr)
 	if err != nil {

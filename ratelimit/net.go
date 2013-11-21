@@ -19,9 +19,9 @@ import (
 )
 
 type RateLimitedConn struct {
-	net.Conn		// underlying network connection
-	rlim, wlim int		// in bytes/second, 0 means no limit
-	rtime, wtime time.Time	// time of last actual read/write
+	net.Conn               // underlying network connection
+	rlim, wlim   int       // in bytes/second, 0 means no limit
+	rtime, wtime time.Time // time of last actual read/write
 }
 
 // New returns a rate-limited connection based on the given connection.
