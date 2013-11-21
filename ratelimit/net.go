@@ -63,12 +63,12 @@ func (rlc RateLimitedConn) Read(b []byte) (n int, err error) {
 	d := t.Sub(rlc.rtime).Nanoseconds()
 
 	// allowed time
-	timePerByteInNano := time.Second.Nanoseconds() / int64(rlc.rlim)
-	timeForThisWriteInNano := timePerByteInNano * int64(n)
+	timePerByte := time.Second.Nanoseconds() / int64(rlc.rlim)
+	timeForNBytes := timePerByte * int64(n)
 
 	// sleep if we have to
-	if n > 0 && d < timeForThisWriteInNano {
-		time.Sleep(time.Duration(timeForThisWriteInNano - d))
+	if n > 0 && d < timeForNBytes {
+		time.Sleep(time.Duration(timeForNBytes - d))
 	}
 
 	// remember when last read finished
@@ -99,12 +99,12 @@ func (rlc RateLimitedConn) Write(b []byte) (n int, err error) {
 	d := t.Sub(rlc.wtime).Nanoseconds()
 
 	// allowed time
-	timePerByteInNano := time.Second.Nanoseconds() / int64(rlc.wlim)
-	timeForThisWriteInNano := timePerByteInNano * int64(n)
+	timePerByte := time.Second.Nanoseconds() / int64(rlc.wlim)
+	timeForNBytes := timePerByte * int64(n)
 
 	// sleep if we have to
-	if n > 0 && d < timeForThisWriteInNano {
-		time.Sleep(time.Duration(timeForThisWriteInNano - d))
+	if n > 0 && d < timeForNBytes {
+		time.Sleep(time.Duration(timeForNBytes - d))
 	}
 
 	// remember when last write finished
