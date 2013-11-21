@@ -44,6 +44,17 @@ var tests = []testCase{
 	{"tcp", "127.0.0.1:8080", 4096, 2048, 8, 1024, time.Duration(4 * time.Second)},
 }
 
+func TestBoundaries(t *testing.T) {
+	_, err := New(nil, -1, 10)
+	if err == nil {
+		t.Errorf("expected New to fail but it didn't")
+	}
+	_, err = New(nil, 10, -1)
+	if err == nil {
+		t.Errorf("expected New to fail but it didn't")
+	}
+}
+
 func TestConnections(t *testing.T) {
 	for _, info := range tests {
 		testConnection(t, info)
