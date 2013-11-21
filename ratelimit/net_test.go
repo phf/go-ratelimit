@@ -17,11 +17,12 @@ import (
 // The idea here is to create a connection with the given
 // rate limits (rlim, wlim), send npack messages of length
 // lpack from client to server, and finally have the server
-// check whether it took within 20% of the stated duration.
+// check whether it took within 20% of the expected duration.
 //
-// Of course I realize that testing against absolute times
-// may be a bad idea especially for the case without rate
-// limits. Not sure what else to do though...
+// Testing against absolute times is a bad idea, especially
+// if we want to test the case without rate limits as well.
+// In fact I had to remove that case because it wouldn't
+// run even remotely reliably. I am open to suggestions.
 
 type testCase struct {
 	net   string
@@ -36,7 +37,7 @@ type testCase struct {
 const accuracy = 0.2
 
 var tests = []testCase{
-	{"tcp", "127.0.0.1:8080", 0, 0, 8, 1024, time.Duration(13 * time.Microsecond)},
+//	{"tcp", "127.0.0.1:8080", 0, 0, 8, 1024, time.Duration(13 * time.Microsecond)},
 	{"tcp", "127.0.0.1:8080", 4096, 0, 8, 1024, time.Duration(2 * time.Second)},
 	{"tcp", "127.0.0.1:8080", 0, 4096, 8, 1024, time.Duration(2 * time.Second)},
 	{"tcp", "127.0.0.1:8080", 2048, 4096, 8, 1024, time.Duration(4 * time.Second)},
@@ -72,10 +73,10 @@ func testConnection(t *testing.T, info testCase) {
 	start := time.Now()
 	n, err := io.ReadFull(rlc, buf)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 	if n != len(buf) {
-		t.Fatalf("read %d bytes instead of %d bytes", n, len(buf))
+		t.Errorf("read %d bytes instead of %d bytes", n, len(buf))
 	}
 	duration := float64(time.Since(start).Nanoseconds())
 	rlc.Close()
@@ -85,7 +86,7 @@ func testConnection(t *testing.T, info testCase) {
 	lower := (1 - accuracy) * expected
 	upper := (1 + accuracy) * expected
 	if lower > duration || duration > upper {
-		t.Fatalf("expected around %f (%f..%f) but got %f", expected, lower, upper, duration)
+		t.Errorf("expected around %f (%f..%f) but got %f", expected, lower, upper, duration)
 	}
 }
 
@@ -107,10 +108,10 @@ func testClient(t *testing.T, info testCase) {
 		data := make([]byte, info.lpack)
 		n, err := rlc.Write(data)
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 		if n != info.lpack {
-			t.Fatalf("wrote %d bytes instead of %d bytes", n, info.lpack)
+			t.Errorf("wrote %d bytes instead of %d bytes", n, info.lpack)
 		}
 	}
 	// close the connection
