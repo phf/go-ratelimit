@@ -42,6 +42,7 @@ var tests = []testCase{
 	{"tcp", "127.0.0.1:8080", 0, 4096, 8, 1024, time.Duration(2 * time.Second)},
 	{"tcp", "127.0.0.1:8080", 2048, 4096, 8, 1024, time.Duration(4 * time.Second)},
 	{"tcp", "127.0.0.1:8080", 4096, 2048, 8, 1024, time.Duration(4 * time.Second)},
+	{"tcp", "127.0.0.1:8080", 16384, 0, 128, 16384, time.Duration(128 * time.Second)},
 }
 
 func TestBoundaries(t *testing.T) {
@@ -57,6 +58,10 @@ func TestBoundaries(t *testing.T) {
 
 func TestConnections(t *testing.T) {
 	for _, info := range tests {
+		if testing.Short() && info.npack*info.lpack > 1024*1024 {
+		        t.Skip("skipping test in short mode")
+		        continue
+		}
 		testConnection(t, info)
 	}
 }
